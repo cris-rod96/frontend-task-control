@@ -69,6 +69,16 @@ function App() {
       });
   };
 
+  const clearCompleted = () => {
+    setFilter("Clear");
+    tasks.getAll().then((res) => {
+      const filterData = res.data.filter(
+        (currentTask: TaskResponse) => currentTask.status !== "Completada"
+      );
+      setData(filterData);
+    });
+  };
+
   React.useEffect(() => {
     fetchTasks();
   }, []);
@@ -140,7 +150,7 @@ function App() {
               </div>
               <div className="px-8 py-5 grid grid-cols-3 text-white">
                 <div className="w-full flex items-center">
-                  <span className="text-gray-500">5 tareas</span>
+                  <span className="text-gray-500">{data.length} tareas</span>
                 </div>
                 <div className="w-full flex items-center justify-center gap-3">
                   <button
@@ -159,17 +169,22 @@ function App() {
                   >
                     Completadas
                   </button>
-                  <button
+                  {/* <button
                     className={`px-3 py-2 border border-gray-500/30 rounded-lg text-sm text-gray-500 hover:bg-gray-500/5 hover:text-white transition-all duration-300 ${
                       filter === "Eliminada" && "bg-gray-500/10 text-white "
                     }`}
                     onClick={() => getTaskByFilter("Eliminada")}
                   >
                     Eliminadas
-                  </button>
+                  </button> */}
                 </div>
                 <div className="w-full flex justify-end">
-                  <button className="px-3 py-2 border border-gray-500/30 rounded-lg text-sm text-gray-500 hover:bg-gray-500/5 hover:text-white transition-all duration-300">
+                  <button
+                    className={`px-3 py-2 border border-gray-500/30 rounded-lg text-sm text-gray-500 hover:bg-gray-500/5 hover:text-white transition-all duration-300 ${
+                      filter === "Clear" && "bg-gray-500/10 text-white"
+                    }`}
+                    onClick={clearCompleted}
+                  >
                     Limpiar completadas
                   </button>
                 </div>
