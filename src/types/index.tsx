@@ -4,3 +4,8 @@ export type TaskResponse = {
   priority: string;
   status: string;
 };
+
+export type TaskRequest = {
+  name: string;
+  priority: string;
+};

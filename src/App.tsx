@@ -1,9 +1,14 @@
-import React from "react";
+import React, { ChangeEvent, FormEvent } from "react";
 import { priorities } from "./assets/config";
 import { tasks } from "./api/tasks";
 import { TaskResponse } from "./types";
 
 function App() {
+  const initialState = {
+    name: "",
+    priority: "",
+  };
+  const [task, setTask] = React.useState(initialState);
   const [data, setData] = React.useState<TaskResponse[]>([]);
 
   const fetchTasks = () => {
@@ -11,6 +16,27 @@ function App() {
       .getAll()
       .then((res) => {
         setData(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement> | FormEvent) => {
+    const { name, value } = e.target as HTMLInputElement;
+    setTask({
+      ...task,
+      [name]: value,
+    });
+
+    console.log(task);
+  };
+
+  const createNewTask = () => {
+    tasks
+      .createTask(task)
+      .then((res) => {
+        console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -35,11 +61,13 @@ function App() {
               <input
                 type="text"
                 className="w-full px-3 py-4 outline-none bg-neutral-800 text-white border-neutral-800 rounded-lg text-sm"
+                name="name"
+                onChange={handleChange}
               />
               <select
-                name=""
-                id=""
+                name="priority"
                 className="p-4 outline-none bg-neutral-800 text-white rounded-lg"
+                onChange={handleChange}
               >
                 {priorities.map((priority) => (
                   <option value={priority}>{priority}</option>
@@ -47,7 +75,10 @@ function App() {
               </select>
             </div>
 
-            <button className="bg-green-900 text-white py-3 cursor-pointer hover:bg-green-800 transition-all duration-300">
+            <button
+              className="bg-green-900 text-white py-3 cursor-pointer hover:bg-green-800 transition-all duration-300"
+              onClick={createNewTask}
+            >
               Guardar
             </button>
           </div>
