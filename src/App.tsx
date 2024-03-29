@@ -10,6 +10,7 @@ function App() {
   };
   const [task, setTask] = React.useState(initialState);
   const [data, setData] = React.useState<TaskResponse[]>([]);
+  const [filter, setFilter] = React.useState("all");
 
   const fetchTasks = () => {
     tasks
@@ -36,7 +37,32 @@ function App() {
     tasks
       .createTask(task)
       .then((res) => {
-        console.log(res);
+        fetchTasks();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const checkTask = (e: ChangeEvent<HTMLInputElement>) => {
+    const { id } = e.target;
+
+    tasks
+      .markTask(id)
+      .then((res) => {
+        fetchTasks();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getTaskByFilter = (value?: string) => {
+    setFilter(value ? value : "all");
+    tasks
+      .getAll(value)
+      .then((res) => {
+        setData(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -91,8 +117,24 @@ function App() {
                     key={task._id}
                     className="w-full border-b border-gray-500/30 px-8 py-10 flex items-center gap-3 text-gray-500"
                   >
-                    <input type="checkbox" name="" id="" className="h-5 w-5" />
-                    <span>{task.name}</span>
+                    <input
+                      type="checkbox"
+                      name=""
+                      id={task._id}
+                      className="h-5 w-5"
+                      onChange={checkTask}
+                      checked={task.status === "Completada"}
+                      disabled={task.status === "Completada"}
+                    />
+                    <span
+                      className={`text-lg relative before:absolute before:w-full before:h-[1px] before:top-1/2 before:bg-gray-500 ${
+                        task.status === "Completada"
+                          ? "before:block"
+                          : "before:hidden"
+                      }`}
+                    >
+                      {task.name}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -101,13 +143,28 @@ function App() {
                   <span className="text-gray-500">5 tareas</span>
                 </div>
                 <div className="w-full flex items-center justify-center gap-3">
-                  <button className="px-3 py-2 border border-gray-500/30 rounded-lg text-sm text-gray-500 hover:bg-gray-500/5 hover:text-white transition-all duration-300">
+                  <button
+                    className={`px-3 py-2 border border-gray-500/30 rounded-lg text-sm text-gray-500 hover:bg-gray-500/5 hover:text-white transition-all duration-300 ${
+                      filter === "all" && "bg-gray-500/10 text-white "
+                    }`}
+                    onClick={() => getTaskByFilter("all")}
+                  >
                     All
                   </button>
-                  <button className="px-3 py-2 border border-gray-500/30 rounded-lg text-sm text-gray-500 hover:bg-gray-500/5 hover:text-white transition-all duration-300">
+                  <button
+                    className={`px-3 py-2 border border-gray-500/30 rounded-lg text-sm text-gray-500 hover:bg-gray-500/5 hover:text-white transition-all duration-300 ${
+                      filter === "Completada" && "bg-gray-500/10 text-white "
+                    }`}
+                    onClick={() => getTaskByFilter("Completada")}
+                  >
                     Completadas
                   </button>
-                  <button className="px-3 py-2 border border-gray-500/30 rounded-lg text-sm text-gray-500 hover:bg-gray-500/5 hover:text-white transition-all duration-300">
+                  <button
+                    className={`px-3 py-2 border border-gray-500/30 rounded-lg text-sm text-gray-500 hover:bg-gray-500/5 hover:text-white transition-all duration-300 ${
+                      filter === "Eliminada" && "bg-gray-500/10 text-white "
+                    }`}
+                    onClick={() => getTaskByFilter("Eliminada")}
+                  >
                     Eliminadas
                   </button>
                 </div>
